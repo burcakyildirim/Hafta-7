@@ -1,6 +1,7 @@
 package com.patikadev.View;
 
 import com.patikadev.Helper.*;
+import com.patikadev.Model.Course;
 import com.patikadev.Model.Operator;
 import com.patikadev.Model.Patika;
 import com.patikadev.Model.User;
@@ -42,18 +43,20 @@ public class OperatorGUI extends JFrame {
     private JPanel pnl_course_form;
     private JTable tbl_course_list;
     private JPanel pnl_course_add;
-    private JTextField textField1;
-    private JLabel fld_course_name;
-    private JTextField fld_course_length;
+    private JTextField fld_course_name;
+    private JTextField fld_course_lang;
     private JComboBox cmb_course_patika;
     private JComboBox cmb_course_user;
     private JButton btn_course_add;
+    private JLabel fld_ders_adı;
     private DefaultTableModel mdl_user_list;
     private Object[] row_user_list;
     private final Operator operator;
     private Object[] row_patika_list;
     private DefaultTableModel mdl_patika_list;
     private JPopupMenu patikaMenu;
+    private DefaultTableModel mdl_course_list;
+    private Object[] row_course_list;
 
     public OperatorGUI(Operator operator) {
 
@@ -109,6 +112,8 @@ public class OperatorGUI extends JFrame {
                     Helper.showMessage("done");
                 }
                 loadUserModel();
+                loadEducatorCombo();
+                loadCourseModel();
             }
         });
         //PatikaList
@@ -125,6 +130,8 @@ public class OperatorGUI extends JFrame {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadPatikaModel();
+                    loadPatikaCombo();
+                    loadCourseModel();
                 }
             });
         });
@@ -135,6 +142,8 @@ public class OperatorGUI extends JFrame {
                 if(Patika.delete(select_id)){
                     Helper.showMessage("done");
                     loadPatikaModel();
+                    loadPatikaCombo();
+                    loadCourseModel();
                 } else {
                  Helper.showMessage("error");
                 }
@@ -161,6 +170,17 @@ public class OperatorGUI extends JFrame {
             }
         });
 
+        //Course List
+        mdl_course_list = new DefaultTableModel();
+        Object[] col_courseList = {"ID", "Ders Adı", "Programlama Dili","Patika","Eğitmen"};
+        mdl_course_list.setColumnIdentifiers(col_courseList);
+        row_course_list = new Object[col_courseList.length];
+        loadCourseModel();
+        tbl_course_list.setModel(mdl_course_list);
+        tbl_course_list.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_course_list.getTableHeader().setReorderingAllowed(false);
+        loadPatikaCombo();
+        loadEducatorCombo();
 
         btn_user_add.addActionListener(e -> {
             if(Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_user_uname)|| Helper.isFieldEmpty(fld_user_pass)) {
@@ -173,6 +193,7 @@ public class OperatorGUI extends JFrame {
                 if(User.add(name,uname,pass,type)) {
                     Helper.showMessage("done");
                     loadUserModel();
+                    loadEducatorCombo();
                     fld_user_name.setText(null);
                     fld_user_uname.setText(null);
                     fld_user_pass.setText(null);
@@ -188,6 +209,9 @@ public class OperatorGUI extends JFrame {
                     if(User.delete(user_id)) {
                         Helper.showMessage("done");
                         loadUserModel();
+                        loadEducatorCombo();
+                        loadCourseModel();
+                        fld_user_id.setText(null);
                     } else {
                         Helper.showMessage("error");
                     }
@@ -212,12 +236,44 @@ public class OperatorGUI extends JFrame {
                 if(Patika.add(fld_patika_name.getText())) {
                     Helper.showMessage("done");
                     loadPatikaModel();
+                    loadPatikaCombo();
                     fld_patika_name.setText(null);
                 } else {
                     Helper.showMessage("error");
                 }
             }
         });
+        btn_course_add.addActionListener(e -> {
+            Item patikaItem = (Item) cmb_course_patika.getSelectedItem();
+            Item userItem = (Item) cmb_course_user.getSelectedItem();
+            if(Helper.isFieldEmpty(fld_course_name) || Helper.isFieldEmpty(fld_course_lang)) {
+                Helper.showMessage("fill");
+            } else {
+                if(Course.add(userItem.getKey(),patikaItem.getKey(),fld_course_name.getText(),fld_course_lang.getText())) {
+                    Helper.showMessage("done");
+                    loadCourseModel();
+                    fld_course_lang.setText(null);
+                    fld_course_name.setText(null);
+                } else {
+                    Helper.showMessage("error");
+                }
+            }
+        });
+    }
+
+    public void loadCourseModel() {
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_course_list.getModel();
+        clearModel.setRowCount(0);
+
+        for(Course obj : Course.getList()) {
+            int i = 0;
+            row_course_list[i++] = obj.getId();
+            row_course_list[i++] = obj.getName();
+            row_course_list[i++] = obj.getLang();
+            row_course_list[i++] = obj.getPatika().getName();
+            row_course_list[i++] = obj.getEducator().getName();
+            mdl_course_list.addRow(row_course_list);
+        }
     }
 
     //PatikaModeList
@@ -259,6 +315,20 @@ public class OperatorGUI extends JFrame {
             row_user_list[i++]= obj.getPass();
             row_user_list[i++]= obj.getType();
             mdl_user_list.addRow(row_user_list);
+        }
+    }
+    public void loadPatikaCombo() {
+        cmb_course_patika.removeAllItems();
+        for(Patika obj : Patika.getList()) {
+            cmb_course_patika.addItem(new Item(obj.getId(),obj.getName()));
+        }
+    }
+    public void loadEducatorCombo() {
+        cmb_course_user.removeAllItems();
+        for(User obj : User.getList()) {
+            if(obj.getType().equals("educator")) {
+                cmb_course_user.addItem(new Item(obj.getId(),obj.getName()));
+            }
         }
     }
     public static void main(String[] args) {
