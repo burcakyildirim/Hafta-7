@@ -167,6 +167,34 @@ public class User {
         }
         return obj;
     }
+    public static User getFetch(String name, String uname,String pass,String type) {
+        User obj = null;
+        String query = "SELECT *  FROM user WHERE uname = ? AND pass = ?";
+
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1, uname);
+            pr.setString(2, pass);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()) {
+                switch (rs.getString("type")) {
+                    case "operator":
+                        obj = new Operator();
+                        break;
+                    default:
+                        obj = new User();
+                }
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUname(rs.getString("uname"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("type"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return obj;
+    }
 
     public static User getFetch(int id) {
         User obj = null;
