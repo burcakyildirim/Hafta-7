@@ -39,6 +39,8 @@ public class SignUpGUI extends JFrame {
                 String type = cmb_sign_type.getSelectedItem().toString();
                 if(Student.add(name,uname,type,pass)) {
                     Helper.showMessage("done");
+                    dispose();
+                    StudentGUI stuGUI = new StudentGUI();
                 }
             }
         });

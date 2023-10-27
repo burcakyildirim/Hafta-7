@@ -19,7 +19,11 @@ public class Student extends User{
     }
     public static boolean add(String name, String uname, String type,String pass) {
         String query = "INSERT INTO student (name, uname, type,pass) VALUES (?,?,?,?)";
-
+        Student findUser = getFetch(uname);
+        if (findUser != null){
+            Helper.showMessage("Bu kullanıcı adı daha önceden eklenmiştir. Lütfen farklı bir kullanıcı adı giriniz.");
+            return false;
+        }
         try {
             PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
             pr.setString(1,name);
@@ -32,5 +36,24 @@ public class Student extends User{
         }
         return true;
     }
-
+    public static Student getFetch(String uname){
+        Student obj = null;
+        String query = "SELECT * FROM student WHERE uname = ?";
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1,uname);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()){
+                obj = new Student();
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUname(rs.getString("uname"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("type"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return obj;
+    }
 }
