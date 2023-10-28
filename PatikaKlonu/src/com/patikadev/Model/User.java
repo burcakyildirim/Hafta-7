@@ -86,7 +86,7 @@ public class User {
                 userList.add(obj);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
         return userList;
     }
@@ -156,6 +156,8 @@ public class User {
                     case "educator":
                         obj = new Educator();
                         break;
+                    case "student":
+                        obj = new Student();
                     default:
                         obj = new User();
                 }
@@ -183,6 +185,12 @@ public class User {
                 switch (rs.getString("type")) {
                     case "operator":
                         obj = new Operator();
+                        break;
+                    case "educator":
+                        obj = new Educator();
+                        break;
+                    case "student":
+                        obj = new Student();
                         break;
                     default:
                         obj = new User();

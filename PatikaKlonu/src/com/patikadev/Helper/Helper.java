@@ -66,9 +66,30 @@ public class Helper {
         }
         return JOptionPane.showConfirmDialog(null, msg,"Son Kararınız mı?",JOptionPane.YES_NO_OPTION) == 0;
     }
+    public static String searchQuery (String name, String uname, String type) {
+        String query = "SELECT * FROM user WHERE name LIKE '%{{name}}%' AND uname LIKE '%{{uname}}%' AND type LIKE '%{{type}}%'";
+        query = query.replace("{{name}}", name);
+        query = query.replace("{{uname}}", uname);
+        query = query.replace("{{type}}",type);
+
+        return query;
+    }
+    public static String searchQuery (String topic) {
+        String query = "SELECT * FROM content WHERE topic LIKE '%{{topic}}%'";
+        query = query.replace("{{topic}}", topic);
+
+        return query;
+    }
+
     public static void optionPaneTR() {
         UIManager.put("OptionPane.okButtonText", "Tamam");
         UIManager.put("OptionPane.yesButtonText", "Evet");
         UIManager.put("OptionPane.noButtonText", "Hayır");
+    }
+    public static String searchQuizQuery (String topic) {
+        String query = "SELECT * FROM quiz WHERE content_topic LIKE '%{{topic}}%'";
+        query = query.replace("{{topic}}", topic);
+
+        return query;
     }
 }
