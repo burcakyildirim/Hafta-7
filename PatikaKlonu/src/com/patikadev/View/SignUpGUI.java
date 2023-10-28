@@ -33,14 +33,14 @@ public class SignUpGUI extends JFrame {
             if(Helper.isFieldEmpty(fld_sign_name) || Helper.isFieldEmpty(fld_sign_uname)||Helper.isFieldEmpty(fld_sign_pass)) {
                 Helper.showMessage("fill");
             } else {
-                String name = fld_sign_name.getText();
-                String uname = fld_sign_uname.getText();
-                String pass = fld_sign_pass.getText();
-                String type = cmb_sign_type.getSelectedItem().toString();
-                if(Student.add(name,uname,type,pass)) {
-                    Helper.showMessage("done");
+                User u = User.getFetch(fld_sign_name.getText(),fld_sign_uname.getText(),fld_sign_pass.getText(),cmb_sign_type.getSelectedItem().toString());
+                if(u == null) {
+                    Helper.showMessage("Kullanıcı Bulunamadı");
+                    fld_sign_name.setText(null);
+                    fld_sign_uname.setText(null);
+                } else {
                     dispose();
-                    StudentGUI stuGUI = new StudentGUI();
+                    StudentGUI stuGUI = new StudentGUI((Student) u);
                 }
             }
         });

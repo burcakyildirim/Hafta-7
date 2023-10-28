@@ -158,6 +158,7 @@ public class User {
                         break;
                     case "student":
                         obj = new Student();
+                        break;
                     default:
                         obj = new User();
                 }
