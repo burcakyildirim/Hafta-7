@@ -6,11 +6,13 @@ import com.patikadev.Model.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class StudentGUI extends JFrame{
     private JPanel wrapper;
-    private JTabbedPane pnl_content;
+    private JTabbedPane pnl_stu_quiz_list;
     private JPanel pnl_patika_list;
     private JTable tbl_stu_patika_list;
     private JScrollPane scrl_patika_list;
@@ -22,9 +24,13 @@ public class StudentGUI extends JFrame{
     private JTable tbl_rgstr_content_list;
     private JTextField fld_review_content_ID;
     private JTextField fld_review_content_topic;
+    private JTable tbl_stu_quiz_list;
+    private JScrollPane scrl_stu_quiz_list;
+    private JTable tbl_answer_quiz;
+    private JPanel pnl_answer_quiz;
+    private JScrollPane scrl_answer_quiz;
+    private JButton btn_logout;
     private final Student student;
-    ArrayList<Integer> courseID = new ArrayList<>();
-    ArrayList<Integer> contentID = new ArrayList<>();
 
     DefaultTableModel mdl_patika_list = new DefaultTableModel();
     private Object[] row_patika_list;
@@ -33,6 +39,20 @@ public class StudentGUI extends JFrame{
     private Object[] row_rgstr_course_list;
     DefaultTableModel mdl_rgstr_content_list = new DefaultTableModel();
     private Object[] row_rgstr_content_list;
+
+    DefaultTableModel mdl_stu_quiz_list = new DefaultTableModel();
+    private Object[] row_stu_quiz_list;
+
+    DefaultTableModel mdl_answer_quiz_list = new DefaultTableModel();
+    private Object[] row_answer_quiz_list;
+    private String select_question;
+    private int select_question_id;
+    private int select_content_id;
+
+
+    ArrayList<Integer> courseID = new ArrayList<>();
+    ArrayList<Integer> contentID = new ArrayList<>();
+    ArrayList<Integer> questionID = new ArrayList<>();
 
     public StudentGUI(Student student) {
         this.student = student;
@@ -130,6 +150,78 @@ public class StudentGUI extends JFrame{
             }
         });
 
+
+        mdl_stu_quiz_list = new DefaultTableModel(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                if (column == 0 )
+                    return false;
+                return super.isCellEditable(row, column);
+            }
+        };
+
+        Object[] col_edu_quiz_list = {"ID", "Quiz Sorusu", "İçerik Başlığı", "İçerik ID"};
+        mdl_stu_quiz_list.setColumnIdentifiers(col_edu_quiz_list);
+        row_stu_quiz_list = new Object[col_edu_quiz_list.length];
+        loadStuQuizModel();
+        tbl_stu_quiz_list.setModel(mdl_stu_quiz_list);
+        tbl_stu_quiz_list.getColumnModel().getColumn(0).setMaxWidth(50);
+        tbl_stu_quiz_list.getColumnModel().getColumn(3).setMaxWidth(100);
+        tbl_stu_quiz_list.getTableHeader().setReorderingAllowed(false);
+
+        tbl_stu_quiz_list.getSelectionModel().addListSelectionListener(e -> {
+            try {
+                select_question = tbl_stu_quiz_list.getValueAt(tbl_stu_quiz_list.getSelectedRow(),1).toString();
+                select_question_id = Integer.parseInt(tbl_stu_quiz_list.getValueAt(tbl_stu_quiz_list.getSelectedRow(),0).toString());
+                select_content_id = Integer.parseInt(tbl_stu_quiz_list.getValueAt(tbl_stu_quiz_list.getSelectedRow(),3).toString());
+            }
+            catch (Exception exception){
+
+            }
+        });
+
+        mdl_answer_quiz_list = new DefaultTableModel(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                if (column == 0 )
+                    return false;
+                return super.isCellEditable(row, column);
+            }
+        };
+
+        Object[] col_stu_answer_quiz_list = {"ID", "Quiz Sorusu", "Cevaplarınız"};
+        mdl_answer_quiz_list.setColumnIdentifiers(col_stu_answer_quiz_list);
+        row_answer_quiz_list = new Object[col_edu_quiz_list.length];
+        loadStuAnsQuizModel();
+        tbl_answer_quiz.setModel(mdl_answer_quiz_list);
+        tbl_answer_quiz.getColumnModel().getColumn(0).setMaxWidth(50);
+        tbl_answer_quiz.getTableHeader().setReorderingAllowed(false);
+
+
+        btn_logout.addActionListener(e -> {
+            dispose();
+            LoginGUI login = new LoginGUI();
+        });
+    }
+
+    private void loadStuAnsQuizModel() {
+    }
+
+    private void loadStuQuizModel() {
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_stu_quiz_list.getModel();
+        clearModel.setRowCount(0);
+        int i;
+        for (Quiz obj : Quiz.getList()){
+            if (contentID.contains(obj.getContent_id())){
+                i = 0;
+                row_stu_quiz_list[i++] = obj.getId();
+                questionID.add(obj.getId());
+                row_stu_quiz_list[i++] = obj.getQuestion();
+                row_stu_quiz_list[i++] = obj.getContent_topic();
+                row_stu_quiz_list[i++] = obj.getContent_id();
+                mdl_stu_quiz_list.addRow(row_stu_quiz_list);
+            }
+        }
     }
 
     private void loadStuContentModel() {
