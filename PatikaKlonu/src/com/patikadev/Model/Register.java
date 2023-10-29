@@ -2,6 +2,7 @@ package com.patikadev.Model;
 
 import com.patikadev.Helper.DBConnector;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -59,5 +60,18 @@ public class Register {
             System.out.println(e.getMessage());
         }
         return regcourseList;
+    }
+    public static boolean add(int course_id, int student_id) {
+        String query = "INSERT INTO register (course_id, student_id) VALUES (?,?)";
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1, course_id);
+            pr.setInt(2, student_id);
+            return pr.executeUpdate() != -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 }
